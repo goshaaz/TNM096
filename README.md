@@ -1,1 +1,1 @@
-# TNM096
+TNM096 Artificial Intelligence: Principles and Techniques
