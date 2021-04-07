@@ -1,6 +1,5 @@
 #include <queue>
 #include <iostream>
-#include <unordered_set>
 #include <array>
 #include <set>
 #include <chrono>
@@ -33,22 +32,162 @@ void print_state(std::array<int, 9> arr) {
         << arr[6] << ' ' << arr[7] << ' ' << arr[8] << '\n';
 }
 
-void print_path(Node* n) {
-    Node* curr = n;
-    while (curr->parent != nullptr) {
-        print_state(curr->state);
-        std::cout << "\n"
-            << "    ^" << "\n"
-            << "    |" << "\n";
-        curr = curr->parent;
-    }
-}
-
-struct CompareNodes {
+struct CompareNodesh2 {
     bool operator()(const Node* n1, const Node* n2) {
         int h_node1 = 0;
         int h_node2 = 0;
-        /*
+
+        int g[3][3] = { {1, 2, 3},
+                        {4,5,6},
+                       {7,8,0} };
+
+        int state1[3][3] = { {n1->state[0], n1->state[1], n1->state[2]},
+                            {n1->state[3], n1->state[4], n1->state[5]},
+                            {n1->state[6], n1->state[7], n1->state[8]} };
+        int state2[3][3] = { {n2->state[0], n2->state[1], n2->state[2]},
+                            {n2->state[3], n2->state[4], n2->state[5]},
+                            {n2->state[6], n2->state[7], n2->state[8]} };
+
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                int val = state1[i][j];
+                int manhattan1 = 0;
+                switch (val) {
+                case 1:
+                {
+                    int distance_x = std::abs(j - 0);
+                    int distance_y = std::abs(i - 0);
+                    manhattan1 += distance_x + distance_y;
+                }
+                break;
+                case 2:
+                {
+                    int distance_x = std::abs(j - 1);
+                    int distance_y = std::abs(i - 0);
+                    manhattan1 += distance_x + distance_y;
+                }
+                break;
+                case 3:
+                {
+                    int distance_x = std::abs(j - 2);
+                    int distance_y = std::abs(i - 0);
+                    manhattan1 += distance_x + distance_y;
+                }
+                break;
+                case 4:
+                {
+                    int distance_x = std::abs(j - 0);
+                    int distance_y = std::abs(i - 1);
+                    manhattan1 += distance_x + distance_y;
+                }
+                break;
+                case 5:
+                {
+                    int distance_x = std::abs(j - 1);
+                    int distance_y = std::abs(i - 1);
+                    manhattan1 += distance_x + distance_y;
+                }
+                break;
+                case 6:
+                {
+                    int distance_x = std::abs(j - 2);
+                    int distance_y = std::abs(i - 1);
+                    manhattan1 += distance_x + distance_y;
+                }
+                break;
+                case 7:
+                {
+                    int distance_x = std::abs(j - 0);
+                    int distance_y = std::abs(i - 2);
+                    manhattan1 += distance_x + distance_y;
+                }
+                break;
+                case 8:
+                {
+                    int distance_x = std::abs(j - 1);
+                    int distance_y = std::abs(i - 2);
+                    manhattan1 += distance_x + distance_y;
+                }
+                break;
+                }
+                h_node1 += manhattan1;
+
+                int val2 = state2[i][j];
+                int manhattan2 = 0;
+                switch (val2) {
+                case 1:
+                {
+                    int distance_x = std::abs(j - 0);
+                    int distance_y = std::abs(i - 0);
+                    manhattan2 += distance_x + distance_y;
+                }
+                break;
+                case 2:
+                {
+                    int distance_x = std::abs(j - 1);
+                    int distance_y = std::abs(i - 0);
+                    manhattan2 += distance_x + distance_y;
+                }
+                break;
+                case 3:
+                {
+                    int distance_x = std::abs(j - 2);
+                    int distance_y = std::abs(i - 0);
+                    manhattan2 += distance_x + distance_y;
+                }
+                break;
+                case 4:
+                {
+                    int distance_x = std::abs(j - 0);
+                    int distance_y = std::abs(i - 1);
+                    manhattan2 += distance_x + distance_y;
+                }
+                break;
+                case 5:
+                {
+                    int distance_x = std::abs(j - 1);
+                    int distance_y = std::abs(i - 1);
+                    manhattan2 += distance_x + distance_y;
+                }
+                break;
+                case 6:
+                {
+                    int distance_x = std::abs(j - 2);
+                    int distance_y = std::abs(i - 1);
+                    manhattan2 += distance_x + distance_y;
+                }
+                break;
+                case 7:
+                {
+                    int distance_x = std::abs(j - 0);
+                    int distance_y = std::abs(i - 2);
+                    manhattan2 += distance_x + distance_y;
+                }
+                break;
+                case 8:
+                {
+                    int distance_x = std::abs(j - 1);
+                    int distance_y = std::abs(i - 2);
+                    manhattan2 += distance_x + distance_y;
+                }
+                break;
+                }
+                h_node2 += manhattan2;
+            }
+        }
+
+        int lhs = n1->distance + h_node1;
+        int rhs = n2->distance + h_node2;
+
+        return lhs > rhs;
+    }
+};
+
+struct CompareNodesh1 {
+    bool operator()(const Node* n1, const Node* n2) {
+        int h_node1 = 0;
+        int h_node2 = 0;
+        
         // h1 Tiles out of place
         if (n1->state[0] != 1) h_node1++;
         if (n1->state[1] != 2) h_node1++;
@@ -67,174 +206,20 @@ struct CompareNodes {
         if (n2->state[5] != 6) h_node2++;
         if (n2->state[6] != 7) h_node2++;
         if (n2->state[7] != 8) h_node2++;
-        */
-        
-        // h2 Manhattan distance
-        std::map<int, std::array<int,2>> m1;
-        std::map<int, std::array<int, 2>> m2;
-        int idx = 0;
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                std::pair<int, std::array<int, 2>> p1;
-                std::pair<int, std::array<int, 2>> p2;
-                p1.first = n1->state[idx];
-                p2.first = n2->state[idx];
-                std::array<int, 2> arr;
-                std::array<int, 2> arr2;
-                arr[0] = i;
-                arr[1] = j;
-                arr2[0] = i;
-                arr2[1] = j;
-                p1.second = arr;
-                p2.second = arr2;
-                m1.insert(p1);
-                m2.insert(p2);
-                idx++;
-            }
-        }
-        for (int i = 0; i < 9; i++) {
-            int y = m1.find(i)->second[0];
-            int x = m1.find(i)->second[1];
-            int manhattan = 0;
-            switch (i) {
-                case 1:
-                {
-                    int diffx = std::abs(x - 0);
-                    int diffy = std::abs(y - 0);
-                    manhattan += (diffx + diffy);
-                }
-                break;
-                case 2:
-                {
-                    int diffx = std::abs(x - 1);
-                    int diffy = std::abs(y - 0);
-                    manhattan += (diffx + diffy);
-                }
-                break;
-                case 3:
-                {
-                    int diffx = std::abs(x - 2);
-                    int diffy = std::abs(y - 0);
-                    manhattan += (diffx + diffy);
-                }
-                break;
-                case 4:
-                {
-                    int diffx = std::abs(x - 0);
-                    int diffy = std::abs(y - 1);
-                    manhattan += (diffx + diffy);
-                }
-                break;
-                case 5:
-                {
-                    int diffx = std::abs(x - 1);
-                    int diffy = std::abs(y - 1);
-                    manhattan += (diffx + diffy);
-                }
-                break;
-                case 6:
-                {
-                    int diffx = std::abs(x - 2);
-                    int diffy = std::abs(y - 1);
-                    manhattan += (diffx + diffy);
-                }
-                break;
-                case 7:
-                {
-                    int diffx = std::abs(x - 0);
-                    int diffy = std::abs(y - 2);
-                    manhattan += (diffx + diffy);
-                }
-                break;
-                case 8:
-                {
-                    int diffx = std::abs(x - 1);
-                    int diffy = std::abs(y - 2);
-                    manhattan += (diffx + diffy);
-                }
-                break;
-            }
-            h_node1 += manhattan;
-        }
 
-        for (int i = 0; i < 9; i++) {
-            int y = m2.find(i)->second[0];
-            int x = m2.find(i)->second[1];
-            int manhattan = 0;
-            switch (i) {
-            case 1:
-            {
-                int diffx = std::abs(x - 0);
-                int diffy = std::abs(y - 0);
-                manhattan += (diffx + diffy);
-            }
-            break;
-            case 2:
-            {
-                int diffx = std::abs(x - 1);
-                int diffy = std::abs(y - 0);
-                manhattan += (diffx + diffy);
-            }
-            break;
-            case 3:
-            {
-                int diffx = std::abs(x - 2);
-                int diffy = std::abs(y - 0);
-                manhattan += (diffx + diffy);
-            }
-            break;
-            case 4:
-            {
-                int diffx = std::abs(x - 0);
-                int diffy = std::abs(y - 1);
-                manhattan += (diffx + diffy);
-            }
-            break;
-            case 5:
-            {
-                int diffx = std::abs(x - 1);
-                int diffy = std::abs(y - 1);
-                manhattan += (diffx + diffy);
-            }
-            break;
-            case 6:
-            {
-                int diffx = std::abs(x - 2);
-                int diffy = std::abs(y - 1);
-                manhattan += (diffx + diffy);
-            }
-            break;
-            case 7:
-            {
-                int diffx = std::abs(x - 0);
-                int diffy = std::abs(y - 2);
-                manhattan += (diffx + diffy);
-            }
-            break;
-            case 8:
-            {
-                int diffx = std::abs(x - 1);
-                int diffy = std::abs(y - 2);
-                manhattan += (diffx + diffy);
-            }
-            break;
-            }
-            h_node2 += manhattan;
-        }
         
-
         int lhs = n1->distance + h_node1;
         int rhs = n2->distance + h_node2;
         return lhs > rhs;
     }
-
+    
 };
 
 int main() {
     auto starttime = std::chrono::high_resolution_clock::now();
     std::set<std::array<int, 9>> visited;
-    std::priority_queue<Node*, std::vector<Node*>, CompareNodes> q;
-    int start[] = {7, 4, 8, 2, 3, 1, 0, 5, 6};
+    std::priority_queue<Node*, std::vector<Node*>, CompareNodesh2> q;
+    int start[] = {8, 6, 7, 2, 5, 4, 3, 0, 1};
     std::array<int, 9> goal = { 1, 2, 3, 4, 5, 6, 7, 8, 0 };
     Node* root = new Node();
     root->distance = 0;
@@ -259,14 +244,13 @@ int main() {
             auto stoptime = std::chrono::high_resolution_clock::now();
             auto duration = std::chrono::duration_cast<std::chrono::seconds>(stoptime - starttime);
             std::cout << "RUNTIME= " << duration.count() << " seconds";
-            std::cout << "\n Iterations=" << iterations;
+            std::cout << "\nIterations=" << iterations;
             std::cout << "\n";
-            print_state(current->state);
             end = current;
             break;
         }
         int empty_pos = emptyPos(current);
-        if (visited.find(current->state) == visited.end()){ // 
+        if (visited.find(current->state) == visited.end()){ 
             switch (empty_pos) {
             case 0:
             {
