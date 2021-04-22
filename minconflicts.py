@@ -64,20 +64,20 @@ def calculatePreferences(state):
     idxof_501 = strarray.index('MT501')
     idxof_502 = strarray.index('MT502')
 
-    if idxof_501 != 12 or idxof_501 != 13 or idxof_501 != 14 or idxof_501 != 15 or idxof_501 != 16 or idxof_501 != 17:
+    if idxof_501 != 12 and idxof_501 != 13 and idxof_501 != 14 and idxof_501 != 15 and idxof_501 != 16 and idxof_501 != 17:
         conflicts += 1
-    if idxof_502 != 12 or idxof_502 != 13 or idxof_502 != 14 or idxof_502 != 15 or idxof_502 != 16 or idxof_502 != 17:
+    if idxof_502 != 12 and idxof_502 != 13 and idxof_502 != 14 and idxof_502 != 15 and idxof_502 != 16 and idxof_502 != 17:
         conflicts += 1    
     return conflicts                                        
 
 def min_conflicts(initialstate,max_steps):
     current = initialstate
     for x in range(max_steps):
-        randompos_i = random.randrange(8)
-        randompos_j = random.randrange(3)
-        while current[randompos_i][randompos_j] == []:
-            randompos_i = random.randrange(8)
-            randompos_j = random.randrange(3)    
+        if getConflictedPositions(current) == []:
+            return current
+        random_conflicted_pos = random.choice(getConflictedPositions(current))
+        randompos_i = random_conflicted_pos[0]
+        randompos_j = random_conflicted_pos[1]
         if len(current[randompos_i][randompos_j]) > 1:
             rand_idx = random.randrange(len(current[randompos_i][randompos_j]))
             h_values = []
@@ -112,7 +112,6 @@ def min_conflicts(initialstate,max_steps):
             current_copy[newpos[0]][newpos[1]].append(current_value)
             current = current_copy    
             if min_value == 0:
-                print("Solution found")
                 return current          
         else:
             h_values = []
@@ -146,10 +145,80 @@ def min_conflicts(initialstate,max_steps):
             current_copy[randompos_i][randompos_j].remove(current_value)
             current_copy[newpos[0]][newpos[1]].append(current_value)
             current = current_copy
-            if min_value == 0:
-                print("Solution found")
+            if getConflictedPositions(current) == []:
                 return current 
 
+def getConflictedPositions(state):
+    confl_arr = []
+    for i in range(8):
+        for j in range(3):
+            if len(state[i][j]) == 1:
+                if j == 0:
+                    if state[i][1] != []:
+                        if len(state[i][1]) > 1:
+                            for idx in range(len(state[i][1])):
+                                if state[i][1][idx][2] == state[i][j][0][2] and state[i][j][0][2] != '5':
+                                    confl_arr.append([i,j])
+                                    break
+                        else:
+                            if state[i][1][0][2] == state[i][j][0][2] and state[i][j][0][2] != '5':
+                                confl_arr.append([i,j])  
+                              
+                    if state[i][2] != []:
+                        if len(state[i][2]) > 1:
+                            for idx in range(len(state[i][2])):
+                                if state[i][2][idx][2] == state[i][j][0][2] and state[i][j][0][2] != '5':
+                                    confl_arr.append([i,j])
+                                    break
+                        else:
+                            if state[i][2][0][2] == state[i][j][0][2] and state[i][j][0][2] != '5':
+                                confl_arr.append([i,j])  
+                                 
+                if j == 1:
+                    if state[i][0] != []:
+                        if len(state[i][0]) > 1:
+                            for idx in range(len(state[i][0])):
+                                if state[i][0][idx][2] == state[i][j][0][2] and state[i][j][0][2] != '5':
+                                    confl_arr.append([i,j])
+                                    break
+                        else:
+                            if state[i][0][0][2] == state[i][j][0][2] and state[i][j][0][2] != '5':
+                                confl_arr.append([i,j])  
+                                 
+                    if state[i][2] != []:
+                        if len(state[i][2]) > 1:
+                            for idx in range(len(state[i][0])):
+                                if state[i][0][idx][2] == state[i][j][0][2] and state[i][j][0][2] != '5':
+                                    confl_arr.append([i,j])
+                                    break
+                        else:
+                            if state[i][2][0][2] == state[i][j][0][2] and state[i][j][0][2] != '5':
+                                confl_arr.append([i,j])  
+                                  
+                if j == 2:
+                    if state[i][0] != []:
+                        if len(state[i][0]) > 1:
+                            for idx in range(len(state[i][0])):
+                                if state[i][0][idx][2] == state[i][j][0][2] and state[i][j][0][2] != '5':
+                                    confl_arr.append([i,j])
+                                    break
+                        else:
+                            if state[i][0][0][2] == state[i][j][0][2] and state[i][j][0][2] != '5':
+                                confl_arr.append([i,j])  
+                               
+                    if state[i][1] != []:
+                        if len(state[i][1]) > 1:
+                            for idx in range(len(state[i][1])):
+                                if state[i][1][idx][2] == state[i][j][0][2] and state[i][j][0][2] != '5':
+                                    confl_arr.append([i,j])
+                                    break
+                        else:
+                            if state[i][1][0][2] == state[i][j][0][2] and state[i][j][0][2] != '5':
+                                confl_arr.append([i,j])  
+                                      
+            elif len(state[i][j]) > 1:
+                confl_arr.append([i,j])
+    return confl_arr
 def calculateConflicts(state):
     conflicts = 0
     for i in range(8):
@@ -188,6 +257,8 @@ def calculateConflicts(state):
     return conflicts                                         
 
 
+
+
 classes = [['MT101'], ['MT102'], ['MT103'],['MT104'], ['MT105'], ['MT106'],['MT107'],
 ['MT201'], ['MT202'], ['MT203'], ['MT204'], ['MT205'], ['MT206'],
 ['MT301'], ['MT302'], ['MT303'], ['MT304'], ['MT401'], ['MT402'], ['MT403'],
@@ -197,6 +268,6 @@ random.shuffle(classes)
 
 classes = np.asarray(classes).reshape(8,3)
 
-#print(min_conflicts(classes, 100))
+#print(min_conflicts(classes, 50))
 
-print(solution_preferences(100))
+print(solution_preferences(300))
